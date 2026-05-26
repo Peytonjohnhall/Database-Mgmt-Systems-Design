@@ -1,0 +1,552 @@
+-- Note that these examples use SS prefixed before table names to avoid conflicts with
+-- other tables with in the same Oracle schema.
+-- The other examples appear in Chapter 15.
+
+-- Note: the results shown in Chapter 15 differ from the results shown here
+-- for most examples because Chapter 15 only shows partial, simplified results
+
+-- Example 15.1
+SELECT StoreZip, TimeMonth, SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada') 
+   AND TimeYear = 2020
+ GROUP BY StoreZip, TimeMonth;
+
+-- Example 15.2
+SELECT StoreZip, TimeMonth, SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada') 
+   AND TimeYear = 2020
+ GROUP BY CUBE(StoreZip, TimeMonth);
+
+--Example 15.3
+SELECT StoreZip, TimeMonth, TimeYear, SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada') 
+   AND TimeYear BETWEEN 2020 AND 2021
+ GROUP BY StoreZip, TimeMonth, TimeYear;
+
+-- Example 15.4
+SELECT StoreZip, TimeMonth, TimeYear, SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada') 
+   AND TimeYear BETWEEN 2020 AND 2021
+ GROUP BY CUBE(StoreZip, TimeMonth, TimeYear);
+
+-- Example 15.5
+SELECT StoreZip, TimeMonth, SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada') 
+   AND TimeYear = 2020
+ GROUP BY StoreZip, TimeMonth
+ UNION
+SELECT StoreZip, NULL, SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada') 
+   AND TimeYear = 2020
+ GROUP BY StoreZip
+UNION
+SELECT NULL, TimeMonth, SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada') 
+   AND TimeYear = 2020
+ GROUP BY TimeMonth
+UNION
+SELECT NULL, NULL, SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada') 
+   AND TimeYear = 2020;
+
+-- Example 15.6
+SELECT TimeYear, TimeQuarter, 
+       SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada') 
+   AND TimeYear BETWEEN 2020 AND 2021
+ GROUP BY ROLLUP(TimeYear, TimeQuarter);
+
+-- Example 15.7
+SELECT TimeYear, TimeQuarter, TimeMonth, SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada') 
+   AND TimeYear BETWEEN 2020 AND 2021
+ GROUP BY ROLLUP(TimeYear, TimeQuarter, TimeMonth);
+
+-- Example 15.8
+SELECT StoreZip, TimeMonth, 
+       SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada') 
+   AND TimeYear BETWEEN 2020 AND 2021
+ GROUP BY ROLLUP(StoreZip, TimeMonth);
+
+-- Example 15.9
+SELECT StoreZip, TimeYear, TimeMonth, SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada') 
+   AND TimeYear BETWEEN 2020 AND 2021
+ GROUP BY ROLLUP(StoreZip, TimeYear, TimeMonth);
+
+-- Example 15.10
+SELECT TimeYear, TimeQuarter, TimeMonth, SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada') 
+   AND TimeYear BETWEEN 2020 AND 2021
+ GROUP BY TimeYear, TimeQuarter, TimeMonth
+ UNION
+SELECT TimeYear, TimeQuarter, NULL, SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada') 
+   AND TimeYear BETWEEN 2020 AND 2021
+ GROUP BY TimeYear, TimeQuarter
+UNION
+SELECT TimeYear, NULL, NULL, SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada') 
+   AND TimeYear BETWEEN 2020 AND 2021
+ GROUP BY TimeYear
+UNION
+SELECT NULL, NULL, NULL, SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada') 
+   AND TimeYear BETWEEN 2020 AND 2021;
+
+-- Example 15.11
+-- Equivalent to Example 15.2
+SELECT StoreZip, TimeMonth, SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada') 
+   AND TimeYear = 2020
+ GROUP BY GROUPING SETS((StoreZip, TimeMonth), StoreZip, TimeMonth, ());
+
+-- Example 15.12
+-- Equivalent to Example 15.4
+SELECT StoreZip, TimeYear, TimeMonth, SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada') 
+   AND TimeYear BETWEEN 2020 AND 2021
+ GROUP BY GROUPING SETS((StoreZip, TimeMonth, TimeYear),
+    (StoreZip,TimeMonth), (StoreZip, TimeYear),
+    (TimeMonth, TimeYear), StoreZip, TimeMonth, TimeYear, () );
+
+-- Example 15.13
+-- Equivalent to Example 15.7
+SELECT TimeYear, TimeQuarter, TimeMonth, SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada') 
+   AND TimeYear BETWEEN 2020 AND 2021
+ GROUP BY GROUPING SETS((TimeYear, TimeQuarter, TimeMonth),
+     (TimeYear, TimeQuarter), TimeYear, () );
+
+-- Example 15.14
+SELECT StoreZip, TimeYear, TimeMonth, SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada') 
+   AND TimeYear BETWEEN 2020 AND 2021
+ GROUP BY GROUPING SETS((StoreZip, TimeYear, TimeMonth),
+    (StoreZip, TimeYear), (TimeMonth, TimeYear),
+    StoreZip, TimeYear, () );
+
+-- Example 15.15
+-- Partial CUBE example
+SELECT TimeMonth, DivId, StoreZip, 
+       SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada')
+   AND TimeYear = 2020
+ GROUP BY TimeMonth, CUBE(DivId, StoreZip)
+ ORDER BY TimeMonth, DivId, StoreZip;
+
+-- Example 15.16
+-- Partial ROLLUP
+SELECT StoreState, TimeMonth, TimeDay,
+       SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada')
+   AND TimeYear = 2020
+ GROUP BY StoreState, ROLLUP(TimeMonth, TimeDay)
+ ORDER BY StoreState, TimeMonth, TimeDay;
+
+-- Example 15.17
+-- Composite column in ROLLUP
+-- No subtotals for StoreState
+SELECT StoreNation, StoreState, StoreCity,
+       SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND TimeYear = 2020
+ GROUP BY ROLLUP(StoreNation, (StoreState, StoreCity))
+ ORDER BY StoreNation, StoreState, StoreCity;
+
+-- Example 15.18
+-- Nested rollup
+-- Compare to partial rollup in Example 15.16
+
+SELECT StoreState, TimeMonth, TimeDay,
+       SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada')
+   AND TimeYear = 2020
+ GROUP BY GROUPING SETS (StoreState, ROLLUP(TimeMonth, TimeDay))
+ ORDER BY StoreState, TimeMonth, TimeDay;
+
+-- Example 15.19
+-- Nested rollup with composite columns
+-- TimeMonth does not combine with ROLLUP.
+-- No grand total
+
+SELECT TimeMonth, StoreNation, StoreState, StoreCity, SUM(SalesDollar) AS SumSales
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada')
+   AND TimeYear = 2020
+ GROUP BY GROUPING SETS(TimeMonth, ROLLUP(StoreNation, (StoreState, StoreCity) ) )
+ ORDER BY TimeMonth, StoreNation, StoreState, StoreCity;
+
+-- Example 15.20
+-- PostgreSQL only as GROOUPING_ID not supported
+-- GROUPING function generates the hierarchical group number for each result row.
+-- GROUPING function in PostgreSQL is the same as GROUPING_ID in Oracle SQL.
+-- One value per set of subtotals.
+-- 0 for the finest level group
+-- Grouping id is incremented for each set of subtotals.
+-- Max grouping id is the grand total (2^n) where n is the number of grouping columns.
+
+SELECT StoreZip, TimeMonth, DivId,
+       SUM(SalesDollar) AS SumSales, GROUPING(StoreZip, TimeMonth,DivId) AS Group_Level
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA', 'Canada') 
+   AND TimeYear = 2020
+ GROUP BY CUBE (StoreZip, TimeMonth, DivId)
+ ORDER BY Group_Level;
+
+-- Example 15.21
+-- Rank products by unit price
+SELECT ItemId, ItemBrand, ItemUnitPrice,
+  RANK() OVER ( ORDER BY ItemUnitPrice ) AS RankUnitPrice
+  FROM SSItem;
+
+-- Example 15.22
+-- Rank customers by descending sum of sales
+SELECT CustName, SUM(SalesDollar) AS SumSales,
+  RANK() OVER (ORDER BY SUM(SalesDollar) DESC) AS SumSalesRank
+  FROM SSSales, SSCustomer
+  WHERE SSSales.CUSTID = SSCustomer.CUSTID
+ GROUP BY CustName;
+
+-- Example 15.23
+-- Rank function with partitioning on GROUP BY result
+SELECT CustState, CustName, SUM(SalesDollar) AS SumSales,
+  RANK() OVER (PARTITION BY CustState 
+               ORDER BY SUM(SalesDollar) DESC) SalesRank
+  FROM SSSales, SSCustomer
+  WHERE SSSales.CUSTID = SSCustomer.CUSTID
+ GROUP BY CustState, CustName
+ ORDER BY CustState;
+
+-- Example 15.24
+-- Common qualitative ranking functions on entire GROUP BY result
+
+SELECT CustZip, SUM(SalesUnits) AS SumSalesUnits,
+  RANK() OVER (ORDER BY SUM(SalesUnits) DESC) SURank,
+  DENSE_RANK() OVER (ORDER BY SUM(SalesUnits) DESC) SUDenseRank,
+  NTILE(4) OVER (ORDER BY SUM(SalesUnits) DESC) SUNTile,
+  ROW_NUMBER() OVER (ORDER BY SUM(SalesUnits) DESC) SURowNum
+ FROM SSSales, SSCustomer
+ WHERE SSSales.CUSTID = SSCustomer.CUSTID
+ GROUP BY CustZip;
+
+-- Example 15.25
+-- Cumulative sales by zip and year (no partitioning)
+
+SELECT StoreZip, TimeYear,
+  SUM(SalesDollar) AS SumSales, SUM(SUM(SalesDollar)) OVER 
+   (ORDER BY StoreZip, TimeYear
+    ROWS UNBOUNDED PRECEDING ) AS CumSumSales
+ FROM SSStore, SSTimeDim, SSSales
+ WHERE SSSales.StoreID = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+ GROUP BY StoreZip, TimeYear;
+
+-- Example 15.26
+-- Cumulative sales by zip and year; partition by zip
+
+SELECT StoreZip, TimeYear, SUM(SalesDollar) AS SumSales,
+  SUM(SUM(SalesDollar)) OVER (PARTITION BY StoreZip
+    ORDER BY StoreZip, TimeYear
+    ROWS UNBOUNDED PRECEDING ) AS CumSumSales
+ FROM SSStore, SSTimeDim, SSSales
+ WHERE SSSales.StoreID = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+ GROUP BY StoreZip, TimeYear;
+
+-- Example 15.27
+-- Moving average of sum of sales by zip and year, and month. 
+-- Center with previous and next row
+
+SELECT StoreZip, TimeYear, SUM(SalesDollar) AS SumSales,
+  AVG(SUM(SalesDollar)) OVER 
+   (ORDER BY StoreZip, TimeYear
+   ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS CenterMovAvgSumSales
+ FROM SSStore, SSTimeDim, SSSales
+ WHERE SSSales.StoreID = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+ GROUP BY StoreZip, TimeYear;
+
+-- Example 15.28
+-- Moving average of sum of sales by zip, year, and month. 
+-- Center with previous and next logical rows
+
+SELECT TimeYear, SUM(SalesDollar) AS SumSales,
+  AVG(SUM(SalesDollar)) OVER 
+   (ORDER BY TimeYear
+   RANGE BETWEEN 1 PRECEDING AND 1 FOLLOWING) AS CenterMovAvgSumSales
+ FROM SSTimeDim, SSSales
+ WHERE SSSales.TimeNo = SSTimeDim.TimeNo
+ GROUP BY TimeYear;
+
+-- Example 15.29
+-- Centered moving average of sum of sales by month. 
+-- FIRST_VALUE and LAST_VALUE functions to show first and last values in a logical window
+
+SELECT TimeMonth, SUM(SalesDollar) AS SumSales, COUNT(*) AS RowCnt,
+  AVG(SUM(SalesDollar)) OVER (ORDER BY TimeMonth
+   RANGE BETWEEN 3 PRECEDING AND 3 FOLLOWING) AS CenterMovAvg,
+  FIRST_VALUE(SUM(SalesDollar)) OVER (ORDER BY TimeMonth
+   RANGE BETWEEN 3 PRECEDING AND 3 FOLLOWING) AS FirstValMovAvg,
+  LAST_VALUE(SUM(SalesDollar)) OVER (ORDER BY TimeMonth
+   RANGE BETWEEN 3 PRECEDING AND 3 FOLLOWING) AS LastValMovAvg
+FROM SSTimeDim, SSSales
+ WHERE SSSales.TimeNo = SSTimeDim.TimeNo
+   AND TimeYear = 2018
+ GROUP BY TimeMonth;
+
+-- Example 15.30b
+-- Oracle supports but not needed with the RATIO_TO_REPORT function
+-- PostgreSQL does not support RATIO_TO_REPORT
+-- SUM analytic function to compute denominators and SUM
+-- aggregate function to compute numerators.
+-- SUM(SalesDollar) is aggregate function.
+-- Outer SUM in SUM( SUM(SalesDollar) OVER ... ) is analytic function.
+
+SELECT TimeYear, CustCity, SUM(SalesDollar) AS SumSales,
+       SUM(SalesDollar) / SUM ( SUM(SalesDollar) )  
+         OVER (PARTITION BY TimeYear) AS SumSalesRatio 
+ FROM SSCustomer, SSSales, SSTimeDim
+ WHERE SSSales.CustID = SSCustomer.CustId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+ GROUP BY TimeYear, CustCity
+ ORDER BY TimeYear, SumSales DESC;
+
+-- Example 15.31
+-- Cumulative distribution functions on item unit price
+-- Display item name, rank, percent rank, and cumulative distribution
+
+SELECT ItemName, ItemUnitPrice,
+  RANK() OVER (ORDER BY ItemUnitPrice) As RankUnitPrice,     
+  PERCENT_RANK() OVER (ORDER BY ItemUnitPrice) As PercentRankUnitPrice,
+  ROW_NUMBER() OVER (ORDER BY ItemUnitPrice) As RowNumUnitPrice,
+  CUME_DIST() OVER (ORDER BY ItemUnitPrice) As CumDistUnitPrice
+ FROM SSItem;
+
+-- Example 15.32
+-- Demonstrate treatment of equal values
+-- Cumulative distribution functions on sum of sales units by customer name
+-- Display customer name, rank, percent rank, and cumulative distribution
+
+SELECT CustName, SUM(SalesUnits) AS SumSalesUnits,
+  RANK() OVER (ORDER BY SUM(SalesUnits) ) AS RankSalesUnits,
+  PERCENT_RANK() OVER (ORDER BY SUM(SalesUnits) ) AS PerRankSalesUnits,
+  ROW_NUMBER() OVER (ORDER BY SUM(SalesUnits)) As RowNumSalesUnits,
+  CUME_DIST() OVER (ORDER BY SUM(SalesUnits) ) AS CumDistSalesUnits
+ FROM SSSales, SSCustomer
+ WHERE SSSales.CUSTID = SSCustomer.CUSTID
+ GROUP BY CustName;
+
+-- Example 15.33
+-- Demonstrate top performers
+-- PostgreSQL requires alias for subqueries
+
+SELECT ItemName, ItemBrand, ItemUnitPrice, CumDistUnitPrice
+ FROM ( SELECT ItemId, ItemName, ItemBrand, ItemUnitPrice,
+          CUME_DIST() 
+  OVER (ORDER BY ItemUnitPrice ASC) As CumDistUnitPrice
+  FROM SSItem ) X
+ WHERE CumDistUnitPrice >= 0.7;
+
+-- Materialized view examples
+DROP MATERIALIZED VIEW MV1;
+DROP MATERIALIZED VIEW MV2;
+DROP MATERIALIZED VIEW MV3;
+
+-- Example 15.34
+-- PostgreSQL does not support the BUILD, REFRESH, and ENABLE QUERY REWRITE clauses
+CREATE MATERIALIZED VIEW MV1 AS
+SELECT StoreState, TimeYear, SUM(SalesDollar) AS SUMDollar1
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND TimeYear > 2018
+ GROUP BY StoreState, TimeYear;
+
+-- Example 15.35
+-- PostgreSQL does not support the BUILD, REFRESH, and ENABLE QUERY REWRITE clauses
+CREATE MATERIALIZED VIEW MV2 AS
+SELECT StoreState, TimeYear, TimeMonth, 
+       SUM(SalesDollar) AS SUMDollar2
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation = 'USA'
+ GROUP BY StoreState, TimeYear, TimeMonth;
+
+-- Example 15.36
+-- PostgreSQL does not support the BUILD, REFRESH, and ENABLE QUERY REWRITE clauses
+CREATE MATERIALIZED VIEW MV3 AS
+SELECT StoreCity, TimeYear, TimeMonth, 
+       SUM(SalesDollar) AS SUMDollar3
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation ='Canada'
+   AND TimeYear <= 2018
+ GROUP BY StoreCity, TimeYear, TimeMonth;
+
+-- Example 15.37
+-- Data warehouse query
+SELECT StoreState, TimeYear, SUM(SalesDollar)
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA','Canada')
+   AND TimeYear = 2020
+ GROUP BY StoreState, TimeYear;
+
+-- Query Rewrite: replace Sales and Time tables with MV1
+SELECT DISTINCT MV1.StoreState, TimeYear, SumDollar1
+FROM MV1, SSStore
+WHERE MV1.StoreState = SSStore.StoreState
+  AND TimeYear = 2020
+  AND StoreNation IN ('USA','Canada');
+
+-- Example 15.38
+-- Data warehouse query
+SELECT StoreState, TimeYear, SUM(SalesDollar)
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA','Canada')
+   AND TimeYear BETWEEN 2018 and 2021
+ GROUP BY StoreState, TimeYear;
+
+-- Query Rewrite
+SELECT DISTINCT MV1.StoreState, TimeYear, SumDollar1 AS StoreSales
+FROM MV1, SSStore
+WHERE MV1.StoreState = SSStore.StoreState
+  AND TimeYear BETWEEN 2019 AND 2021
+  AND StoreNation IN ('USA','Canada')
+UNION
+SELECT StoreState, TimeYear, SUM(SumDollar2) as StoreSales
+FROM MV2
+WHERE TimeYear = 2018
+GROUP BY StoreState, TimeYear
+UNION
+SELECT DISTINCT StoreState, TimeYear, SUM(SumDollar3) as StoreSales
+FROM MV3, SSStore
+WHERE MV3.StoreCity = SSStore.StoreCity
+  AND TimeYear = 2018
+  AND StoreNation = 'Canada'
+GROUP BY StoreState, TimeYear;
+
+-- Example 15.39
+-- Data warehouse query
+-- Adds CUBE to Example 15.38
+SELECT StoreState, TimeYear, SUM(SalesDollar)
+ FROM SSSales, SSStore, SSTimeDim
+ WHERE SSSales.StoreId = SSStore.StoreId 
+   AND SSSales.TimeNo = SSTimeDim.TimeNo
+   AND StoreNation IN ('USA','Canada')
+   AND TimeYear BETWEEN 2018 and 2021
+ GROUP BY CUBE(StoreState, TimeYear);
+
+-- Query Rewrite
+-- Subquery must use alias name
+SELECT StoreState, TimeYear, SUM(StoreSales) as SumStoreSales
+ FROM (
+  SELECT DISTINCT MV1.StoreState, TimeYear, SumDollar1 AS StoreSales
+   FROM MV1, SSStore
+   WHERE MV1.StoreState = SSStore.StoreState
+     AND TimeYear BETWEEN 2019 AND 2021
+     AND StoreNation IN ('USA','Canada')
+ UNION
+  SELECT StoreState, TimeYear, SUM(SumDollar2) as StoreSales
+   FROM MV2
+   WHERE TimeYear = 2018
+   GROUP BY StoreState, TimeYear
+ UNION
+  SELECT DISTINCT StoreState, TimeYear, SUM(SumDollar3) as StoreSales
+   FROM MV3, SSStore
+   WHERE MV3.StoreCity = SSStore.StoreCity
+     AND TimeYear = 2018 
+     AND StoreNation = 'Canada' 
+   GROUP BY StoreState, TimeYear ) X
+GROUP BY CUBE(StoreState, TimeYear);
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,952 @@
+-- PostgreSQL trigger examples for Chapter 11
+-- Trigger functions use pl/pgsql
+-- Do not execute in Oracle
+-- Some testing scripts may require auto commit with reversing manipulation statements.
+-- Some testing scripts may require auto commit off and auto rollback on error.
+
+/**************************************************************************************************************************/
+-- Example 11.22: Trigger That Fires for INSERT statements on the Course Table Along with Testing Code to Fire the Trigger
+/**************************************************************************************************************************/
+-- These examples work with Auto Commmit set to off.
+-- Create Trigger function
+
+CREATE OR REPLACE FUNCTION tr_Course_IA()
+	RETURNS TRIGGER AS $tr_Course_IA$
+BEGIN
+    -- No references to OLD row because only NEW exists for INSERT
+    raise notice 'Inserted Row';
+  	raise notice 'CourseNo: %', NEW.CourseNo;
+    raise notice 'Course Description: %' ,NEW.CrsDesc;
+    raise notice 'Course Units: %', NEW.CrsUnits;
+	RETURN NULL;
+END;
+$tr_Course_IA$ LANGUAGE plpgsql; -- Run from Create... to this line
+
+-- Create Trigger
+CREATE TRIGGER tr_Course_IA
+	AFTER INSERT 
+	ON Course
+	FOR EACH ROW EXECUTE FUNCTION tr_Course_IA();
+	
+
+-- Testing statements
+INSERT INTO Course (CourseNo, CrsDesc, CrsUnits)
+ VALUES ('IS485','Advanced Database Management',4);
+
+-- PostgreSQL DROP TRIGGER statement does not comply with SQL standard syntax. Target table name must be provided.
+DROP TRIGGER tr_Course_IA ON Course;
+DROP FUNCTION tr_Course_IA;
+ROLLBACK;
+
+
+
+/**************************************************************************************************************************/
+-- Example 11.23: Trigger That Fires for Every UPDATE Statement on the Course Table Along with Testing Code to Fire the Trigger
+/**************************************************************************************************************************/.
+
+-- Create Trigger function
+CREATE OR REPLACE FUNCTION tr_Course_UA() 
+	RETURNS TRIGGER AS $tr_Course_UA$
+	BEGIN
+	    raise notice 'New Row Values' ;
+		raise notice 'CourseNo: %', NEW.CourseNo ;
+		raise notice 'Course Description: %' ,NEW.CrsDesc ;
+		raise notice 'Course Units: %' ,NEW.CrsUnits  ;
+
+		raise notice 'Old Row Values' ;
+		raise notice 'CourseNo: %' ,OLD.CourseNo ;
+		raise notice 'Course Description: %' ,OLD.CrsDesc ;
+		raise notice 'Course Units: %',OLD.CrsUnits  ;
+		RETURN NULL;
+	END;
+$tr_Course_UA$ LANGUAGE plpgsql;  
+
+-- Create Trigger 
+CREATE TRIGGER tr_Course_UA 
+	AFTER UPDATE ON Course
+	FOR EACH ROW EXECUTE FUNCTION tr_Course_UA();
+
+-- If duplicate key value violates, run this 
+-- DELETE FROM Course
+-- WHERE CourseNo = 'IS485' ;
+
+-- Testing statements
+INSERT INTO Course (CourseNo, CrsDesc, CrsUnits)
+ VALUES ('IS485','Advanced Database Management',4);
+
+UPDATE Course
+SET CrsUnits = 3
+WHERE CourseNo = 'IS485';
+
+DROP TRIGGER tr_Course_UA ON Course;
+DROP FUNCTION tr_Course_UA;
+ROLLBACK;
+
+
+/**************************************************************************************************************************/
+-- Example 11.24: Trigger That Fires for Every DELETE Statement on the Course Table Along with Testing Code to Fire the Trigger
+/**************************************************************************************************************************/
+
+-- Create Trigger function
+
+CREATE OR REPLACE FUNCTION tr_Course_DA()
+	RETURNS TRIGGER AS $tr_Course_DA$
+BEGIN
+    -- No references to OLD row because only NEW exists for INSERT
+    raise notice 'Deleted Row';
+  	raise notice 'CourseNo: %', OLD.CourseNo;
+    raise notice 'Course Description: %' , OLD.CrsDesc;
+    raise notice 'Course Units: %', OLD.CrsUnits;
+	RETURN NULL;
+END;
+$tr_Course_DA$ LANGUAGE plpgsql; -- Run from Create... to this line
+
+-- Create Trigger
+CREATE TRIGGER tr_Course_DA
+	AFTER DELETE ON Course
+	FOR EACH ROW EXECUTE FUNCTION tr_Course_DA();
+	
+-- Testing Statements
+
+-- Insert row so that it can be deleted
+INSERT INTO Course (CourseNo, CrsDesc, CrsUnits)
+ VALUES ('IS485','Advanced Database Management',4);
+
+DELETE FROM Course
+ WHERE CourseNo = 'IS485';
+
+DROP TRIGGER tr_Course_DA ON Course;
+DROP FUNCTION tr_Course_DA;
+ROLLBACK;
+
+
+/**************************************************************************************************************************/
+-- Example 11.25: Trigger with a Combined Event That Fires for Every action on the Course Table Along with 
+-- testing Code to Fire the Trigger
+/**************************************************************************************************************************/
+
+-- Create Trigger function
+CREATE OR REPLACE FUNCTION tr_Course_DIUA()
+	RETURNS TRIGGER AS $tr_Course_DIUA$
+BEGIN
+
+	raise notice 'Inserted Row';
+	raise notice 'CourseNo: %', NEW.CourseNo;
+	raise notice 'Course Description: %' ,NEW.CrsDesc;
+	raise notice 'Course Units: %', NEW.CrsUnits;
+
+	raise notice 'Deleted Row';
+	raise notice 'CourseNo: %', OLD.CourseNo;
+	raise notice 'Course Description: %' , OLD.CrsDesc;
+	raise notice 'Course Units: %', OLD.CrsUnits;
+	RETURN NULL;
+END;
+$tr_Course_DIUA$ LANGUAGE plpgsql;
+
+-- Create Trigger
+CREATE TRIGGER tr_Course_DIUA
+	AFTER INSERT OR UPDATE OR DELETE
+	ON Course
+	FOR EACH ROW EXECUTE FUNCTION tr_Course_DIUA();
+
+-- Testing Statements
+
+INSERT INTO Course (CourseNo, CrsDesc, CrsUnits)
+VALUES ('IS485','Advanced Database Management',4);
+
+UPDATE Course
+ SET CrsUnits = 3
+ WHERE CourseNo = 'IS485';
+
+DELETE FROM Course
+ WHERE CourseNo = 'IS485';
+
+DROP TRIGGER tr_Course_DIUA ON Course;
+DROP FUNCTION tr_Course_DIUA;
+ROLLBACK;
+
+/**************************************************************************************************************************/
+-- Example 11.26: Trigger to Ensure That a Seat Remains in an Offering
+/**************************************************************************************************************************/
+
+-- Drop the previous trigger to avoid interactions
+-- Set auto commit off and auto rollback on error.
+DROP TRIGGER IF EXISTS tr_Enrollment_IB on Enrollment;
+
+-- Create Trigger function
+CREATE OR REPLACE FUNCTION tr_Enrollment_IB()
+	RETURNS TRIGGER AS $tr_Enrollment_IB$
+DECLARE
+    anOffLimit Offering.OffLimit%TYPE;
+    anOffNumEnrolled Offering.OffNumEnrolled%TYPE;
+BEGIN
+  SELECT OffLimit, OffNumEnrolled INTO anOffLimit, anOffNumEnrolled
+    FROM Offering
+    WHERE Offering.OfferNo = NEW.OfferNo;
+
+	IF anOffNumEnrolled >= anOffLimit THEN
+		raise exception 'No seats remaining in offering %. Number enrolled: %. Offering limit: %.', 
+							NEW.OfferNo,anOffNumEnrolled, anOffLimit;   		
+	END IF;
+	RETURN NEW;
+END;
+$tr_Enrollment_IB$ LANGUAGE plpgsql;
+
+-- Create Trigger
+-- This trigger ensures that the number of enrolled
+-- students is less than the offering limit.
+CREATE TRIGGER tr_Enrollment_IB
+	BEFORE INSERT 
+	ON Enrollment
+	FOR EACH ROW EXECUTE FUNCTION tr_Enrollment_IB();
+
+-- Testing Statements
+-- Insert the last student
+ 
+INSERT INTO Enrollment (RegNo, OfferNo, EnrGrade)
+	VALUES (1234,5679,0);
+
+-- Use the INSERT and UPDATE statements if auto commit and no rollback
+-- update the number of enrolled students
+UPDATE Offering
+	SET OffNumEnrolled = OffNumEnrolled + 1
+	WHERE OfferNo = 5679;
+
+-- See offering limit and number enrolled
+SELECT OffLimit, OffNumEnrolled
+	FROM Offering
+	WHERE Offering.OfferNo = 5679;
+ 
+-- Insert a student beyond the limit
+INSERT INTO Enrollment (RegNo, OfferNo, EnrGrade)
+	VALUES (1236,5679,0);
+
+SELECT *
+ FROM Enrollment
+ WHERE OfferNo = 5679 and RegNo = 1234 ;
+
+ROLLBACK;
+
+/**************************************************************************************************************************/
+-- Example 11.27: Trigger to Update the Number of Enrolled Students in an Offering
+/**************************************************************************************************************************/
+
+-- Set auto commit off and auto rollback on error.
+-- Create Trigger function
+CREATE OR REPLACE FUNCTION tr_Enrollment_IA()
+	RETURNS TRIGGER AS $tr_Enrollment_IA$
+BEGIN
+	BEGIN
+		UPDATE Offering
+			SET OffNumEnrolled = OffNumEnrolled + 1
+			WHERE OfferNo = NEW.OfferNo;
+		EXCEPTION 
+			WHEN OTHERS THEN
+				raise notice 'Database error';
+			RETURN NULL;
+	END;	
+	RETURN NULL;
+END;
+$tr_Enrollment_IA$ LANGUAGE plpgsql;
+
+-- Create Trigger
+-- This trigger updates the number of enrolled
+-- students in the related offering row.
+
+CREATE TRIGGER tr_Enrollment_IA
+AFTER INSERT 
+ON Enrollment
+FOR EACH ROW EXECUTE FUNCTION tr_Enrollment_IA();
+
+-- Testing statements
+-- See the offering limit and number enrolled
+SELECT OffLimit, OffNumEnrolled
+ FROM Offering
+ WHERE Offering.OfferNo = 5679;
+
+-- Insert the last student
+INSERT INTO Enrollment (RegNo, OfferNo, EnrGrade)
+VALUES (1234,5679,0);
+
+-- See the offering limit and number enrolled
+SELECT OffLimit, OffNumEnrolled
+ FROM Offering
+ WHERE Offering.OfferNo = 5679;
+
+ROLLBACK;
+
+/**************************************************************************************************************************/
+-- Example 11.28: Trigger to Ensure That a Seat Remains in an Offering When Inserting or Updating an Enrollment Row
+/**************************************************************************************************************************/
+
+-- Drop the previous triggers to avoid interactions
+DROP TRIGGER IF EXISTS tr_Enrollment_IB  ON Enrollment;
+DROP FUNCTION IF EXISTS tr_Enrollment_IB;
+DROP TRIGGER IF EXISTS tr_Enrollment_IA  ON Enrollment;
+DROP FUNCTION IF EXISTS tr_Enrollment_IA;
+
+CREATE OR REPLACE FUNCTION tr_Enrollment_IUB()
+	RETURNS TRIGGER AS $tr_Enrollment_IUB$
+DECLARE
+    anOffLimit Offering.OffLimit%TYPE;
+    anOffNumEnrolled Offering.OffNumEnrolled%TYPE;
+BEGIN
+  SELECT OffLimit, OffNumEnrolled 
+    INTO anOffLimit, anOffNumEnrolled
+    FROM Offering
+    WHERE Offering.OfferNo = NEW.OfferNo;
+	
+  IF (anOffNumEnrolled >= anOffLimit) THEN
+    RAISE EXCEPTION 
+      'No seats remaining in offering %. Number enrolled: %. Offering limit: %.', 
+      NEW.OfferNo,anOffNumEnrolled, anOffLimit;
+  END IF;
+  RETURN NEW;
+END;
+$tr_Enrollment_IUB$ LANGUAGE plpgsql;
+
+-- Create Trigger
+-- This trigger ensures that the number of enrolled
+-- students is less than the offering limit.
+CREATE TRIGGER tr_Enrollment_IUB
+BEFORE INSERT OR UPDATE OF OfferNo ON Enrollment
+FOR EACH ROW EXECUTE FUNCTION tr_Enrollment_IUB();
+
+-- Testing statement
+
+-- Insert  the last student
+INSERT INTO Enrollment (RegNo, OfferNo, EnrGrade)
+VALUES (1234,5679,0);
+
+-- update the number of enrolled students
+UPDATE Offering
+	SET OffNumEnrolled = OffNumEnrolled + 1
+	WHERE OfferNo = 5679;
+
+-- See offering limit and number enrolled
+SELECT OffLimit, OffNumEnrolled
+	FROM Offering
+	WHERE Offering.OfferNo = 5679;
+ 
+-- Insert a student beyond the limit
+INSERT INTO Enrollment (RegNo, OfferNo, EnrGrade)
+	VALUES (1236,5679,0);
+
+/**************************************************************************************************************************/
+-- Example 11.29: Trigger to Update the Number of Enrolled Students in an Offering When Inserting, Updating, or Deleting an Enrollment Row
+/**************************************************************************************************************************/
+
+-- Drop the previous triggers to avoid interactions
+DROP TRIGGER IF EXISTS tr_Enrollment_IB  ON Enrollment;
+DROP FUNCTION IF EXISTS tr_Enrollment_IB;
+DROP TRIGGER IF EXISTS tr_Enrollment_IA  ON Enrollment;
+DROP FUNCTION IF EXISTS tr_Enrollment_IA;
+
+-- Create Trigger function
+CREATE OR REPLACE FUNCTION tr_Enrollment_DIUA()
+	RETURNS TRIGGER AS $tr_Enrollment_DIUA$
+BEGIN
+	-- Increment the number of enrolled students for insert, update
+	IF (TG_OP = 'UPDATE' or TG_OP = 'INSERT') THEN   
+    	UPDATE Offering
+      	  SET OffNumEnrolled = OffNumEnrolled + 1
+      	  WHERE OfferNo = NEW.OfferNo;
+ 	END IF;
+	-- Decrease the number of enrolled students for delete, update
+	IF (TG_OP = 'UPDATE' or TG_OP = 'DELETE')  THEN
+   	 UPDATE Offering
+     	   SET OffNumEnrolled = OffNumEnrolled - 1
+     	   WHERE OfferNo = OLD.OfferNo;
+	END IF;
+	
+	RETURN NULL;
+END;
+$tr_Enrollment_DIUA$ LANGUAGE plpgsql;
+
+-- Create Trigger
+-- This trigger updates the number of enrolled
+-- students the related offering row.
+
+CREATE TRIGGER tr_Enrollment_DIUA
+AFTER INSERT OR DELETE OR UPDATE OF OfferNo ON Enrollment
+FOR EACH ROW EXECUTE FUNCTION tr_Enrollment_DIUA();
+
+-- Testing statements
+-- See the offering limit and number enrolled
+SELECT OffLimit, OffNumEnrolled
+ FROM Offering
+ WHERE Offering.OfferNo = 5679;
+
+-- Insert the last student
+INSERT INTO Enrollment (RegNo, OfferNo, EnrGrade)
+VALUES (1234,5679,0);
+
+-- See the offering limit and number enrolled
+SELECT OffLimit, OffNumEnrolled
+ FROM Offering
+ WHERE Offering.OfferNo = 5679;
+
+-- Delete the last student
+DELETE FROM Enrollment
+WHERE RegNo = 1234 and OfferNo = 5679 ;
+
+-- See the offering limit and number enrolled
+SELECT OffLimit, OffNumEnrolled
+ FROM Offering
+ WHERE Offering.OfferNo = 5679;
+
+
+/**************************************************************************************************************************/
+-- Example 11.30: Script to Test the Triggers in Examples 11.28 and 11.29
+/**************************************************************************************************************************/
+
+-- Test case 1
+-- See the offering limit and number enrolled
+SELECT OffLimit, OffNumEnrolled
+ FROM Offering
+ WHERE Offering.OfferNo = 5679;
+-- Insert the last student
+INSERT INTO Enrollment (RegNo, OfferNo, EnrGrade)
+ VALUES (1234,5679,0);
+-- See the offering limit and the number enrolled
+SELECT OffLimit, OffNumEnrolled
+ FROM Offering
+ WHERE Offering.OfferNo = 5679;
+
+-- Test case 2
+-- Insert a student beyond the limit: exception raised
+INSERT INTO Enrollment (RegNo, OfferNo, EnrGrade)
+ VALUES (1236,5679,0);
+-- Transfer a student to offer 5679: exception raised
+-- Exception raised after commit of test case 1
+UPDATE Enrollment
+ SET OfferNo = 5679
+ WHERE RegNo = 1234 AND OfferNo = 1234;
+
+SELECT OffLimit, OffNumEnrolled
+ FROM Offering
+ WHERE Offering.OfferNo = 1234;
+
+-- Test case 3
+-- See the offering limit and the number enrolled before update
+SELECT OffLimit, OffNumEnrolled
+ FROM Offering
+ WHERE Offering.OfferNo = 4444;
+-- Update a student to a non full offering
+UPDATE Enrollment
+ SET OfferNo = 4444
+ WHERE RegNo = 1234 AND OfferNo = 1234;
+-- See the offering limit and the number enrolled after update
+SELECT OffLimit, OffNumEnrolled
+ FROM Offering
+ WHERE Offering.OfferNo = 4444;
+
+-- Test case 4
+-- See the offering limit and the number enrolled before delete
+SELECT OffLimit, OffNumEnrolled
+ FROM Offering
+ WHERE Offering.OfferNo = 1234;
+-- Delete an enrollment
+DELETE FROM Enrollment
+ WHERE OfferNo = 1234;
+-- See the offering limit and the number enrolled
+SELECT OffLimit, OffNumEnrolled
+ FROM Offering
+ WHERE Offering.OfferNo = 1234;
+
+-- DROP TRIGGERS
+DROP TRIGGER IF EXISTS tr_Enrollment_DIUA  ON Enrollment;
+DROP FUNCTION IF EXISTS tr_Enrollment_DIUA;
+DROP TRIGGER IF EXISTS tr_Enrollment_IUB  ON Enrollment;
+DROP FUNCTION IF EXISTS tr_Enrollment_IUB;
+
+ROLLBACK;
+
+/**************************************************************************************************************************/
+-- Example 11.31: Trigger to Ensure That a Salary Increase Does Not Exceed 10 percent 
+/**************************************************************************************************************************/
+
+-- Create Trigger function
+
+CREATE OR REPLACE FUNCTION tr_FacultySalary_UB()
+	RETURNS TRIGGER AS $tr_FacultySalary_UB$
+BEGIN
+	IF (NEW.FacSalary > 1.1 * OLD.FacSalary) THEN
+		raise exception 'Salary increase exceeds 10%%. Current salary: %. New salary: %', OLD.FacSalary, NEW.FacSalary; 
+	END IF;
+	RETURN NEW;
+END;
+$tr_FacultySalary_UB$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER tr_FacultySalary_UB
+BEFORE UPDATE OF FacSalary
+ON Faculty
+FOR EACH ROW EXECUTE FUNCTION tr_FacultySalary_UB();
+
+-- Test case 1: salary increase of 5%
+UPDATE Faculty
+ SET FacSalary = FacSalary * 1.05
+ WHERE FacNo = '543-21-0987';
+
+SELECT FacSalary FROM Faculty WHERE FacNo = '543-21-0987';
+
+-- Test case 2: salary increase of 20% should generate an error.
+UPDATE Faculty
+ SET FacSalary = FacSalary * 1.20
+ WHERE FacNo = '543-21-0987';
+
+/**************************************************************************************************************************/
+-- Example 11.32: Trigger to Change the Case of a Faculty First and Last Name
+/**************************************************************************************************************************/
+
+CREATE OR REPLACE FUNCTION tr_FacultyName_IUB()
+	RETURNS TRIGGER AS $tr_FacultyName_IUB$
+BEGIN
+    NEW.FacFirstName := UPPER(NEW.FacFirstName);
+    NEW.FacLastName := UPPER(NEW.FacLastName);
+	RETURN NEW;
+END;
+$tr_FacultyName_IUB$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER tr_FacultyName_IUB
+BEFORE INSERT OR UPDATE OF FacFirstName, FacLastName
+ON Faculty
+FOR EACH ROW EXECUTE FUNCTION tr_FacultyName_IUB();
+
+-- Testing Statements
+
+-- Testing statements
+UPDATE Faculty
+	SET FacFirstName = 'Joe', FacLastName = 'Smith'
+	WHERE FacNo = '543-21-0987';
+	
+-- Display the changed faculty name.
+
+SELECT FacFirstName, FacLastName
+	FROM Faculty
+	WHERE FacNo = '543-21-0987';
+
+
+/**************************************************************************************************************************/
+-- Example 11.33: Trigger to Insert a Row into an Exception Table. When a salary increase exceeds 10 percent, the trigger fires. 
+/**************************************************************************************************************************/
+
+CREATE TABLE LogTable
+(ExcNo		INTEGER PRIMARY KEY,
+ ExcTrigger	VARCHAR(25) NOT NULL,
+ ExcTable	VARCHAR(25) NOT NULL,
+ ExcKeyValue	VARCHAR(15) NOT NULL,
+ ExcDate	DATE DEFAULT CURRENT_DATE NOT NULL,
+ ExcText	VARCHAR(255) NOT NULL );
+ 
+CREATE SEQUENCE LogSeq INCREMENT BY 1;
+
+-- drop trigger
+DROP TRIGGER IF EXISTS tr_FacultySalary_UB on Faculty
+
+CREATE OR REPLACE FUNCTION tr_FacultySalary_UA()
+	RETURNS TRIGGER AS $tr_FacultySalary_UA$
+BEGIN
+	IF (NEW.FacSalary > 1.1 * OLD.FacSalary) THEN
+		INSERT INTO LogTable(ExcNo, ExcTrigger, ExcTable, ExcKeyValue, ExcDate, ExcText)
+	  	VALUES (NEXTVAL('LogSeq'), 'TR_ FacultySalary_UA', 'Faculty',New.FacNo, CURRENT_DATE, 'Salary raise greater than 10%');
+	END IF;		
+	RETURN NULL;
+END;
+$tr_FacultySalary_UA$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER tr_FacultySalary_UA
+AFTER UPDATE OF FacSalary
+ON Faculty
+FOR EACH ROW EXECUTE FUNCTION tr_FacultySalary_UA();
+
+-- Test case 1: salary increase of 5%
+UPDATE Faculty
+ SET FacSalary = FacSalary * 1.05
+ WHERE FacNo = '543-21-0987';
+SELECT FacSalary FROM Faculty WHERE FacNo = '543-21-0987';
+SELECT * FROM LogTable;
+
+-- Test case 2: salary increase of 20% should generate an exception.
+UPDATE Faculty
+ SET FacSalary = FacSalary * 1.20
+ WHERE FacNo = '543-21-0987';
+SELECT FacSalary FROM Faculty WHERE FacNo = '543-21-0987';
+SELECT * FROM LogTable;
+
+/**************************************************************************************************************************/
+-- Example 11.34: CREATE TABLE Statements for the Student Generalization Hierarchy.
+/**************************************************************************************************************************/
+
+-- Student2 is the parent table in the generalization hierarchy
+CREATE TABLE Student2(
+ StdNo CHAR(11),
+ StdFirstName VARCHAR(20) not null,
+ StdLastName VARCHAR(30) not null,
+ StdGPA DECIMAL(3,2),
+ CONSTRAINT Student2PK PRIMARY KEY (StdNo) );
+
+-- UndStudent2 is a child table in the generalization hierarchy
+CREATE TABLE UndStudent2(
+ StdNo CHAR(11),
+ UStdMajor CHAR(6),
+ UStdMinor CHAR(6),
+ UStdClass CHAR(2),
+ CONSTRAINT UndStudent2PK PRIMARY KEY (StdNo), 
+ CONSTRAINT UndStudent2FK FOREIGN KEY(StdNo) REFERENCES Student2 
+   ON DELETE CASCADE );
+
+-- GradStudent2 is a child table in the generalization hierarchy
+CREATE TABLE GradStudent2(
+ StdNo CHAR(11),
+ GStdAdvisor VARCHAR(20),
+ GStdThesisOpt CHAR(10) DEFAULT 'NONTHESIS', -- NONTHESIS or THESIS
+ GStdAsstStatus CHAR(6) DEFAULT 'NONE', -- NONE, TA, RA
+ CONSTRAINT GradStudent2PK PRIMARY KEY (StdNo), 
+ CONSTRAINT GradStudent2FK FOREIGN KEY(StdNo) REFERENCES Student2 
+   ON DELETE CASCADE );
+
+/**************************************************************************************************************************/
+-- Example 11.35: CREATE VIEW Statements for Views Used to Manipulate the Student Generalization Hierarchy.
+/**************************************************************************************************************************/
+
+-- View for undergraduate students
+CREATE VIEW AllUndStudent AS
+  SELECT Student2.StdNo, StdFirstName, StdLastName, StdGPA,
+         UStdMajor, UStdMinor, UStdClass
+    FROM Student2, UndStudent2
+    WHERE Student2.StdNo = UndStudent2.Stdno;
+	
+-- View for graduate students
+	CREATE VIEW AllGradStudent AS
+	  SELECT Student2.StdNo, StdFirstName, StdLastName, StdGPA,
+			 GStdAdvisor, GStdThesisOpt, GStdAsstStatus
+		FROM Student2, GradStudent2
+		WHERE Student2.StdNo = GradStudent2.Stdno;
+
+
+
+
+/**************************************************************************************************************************/
+-- Example 11.36: Triggers to Insert Rows in Child and Parent Tables of the Student Generalization Hierarchy
+/**************************************************************************************************************************/
+
+-- Create Trigger function
+
+CREATE OR REPLACE FUNCTION tr_AllUndStudent_II()
+	RETURNS TRIGGER AS $tr_AllUndStudent_II$
+BEGIN
+	BEGIN
+		-- Insert into parent (Student2)
+		INSERT INTO Student2 (StdNo, StdFirstName, StdLastName,StdGPA) 
+		VALUES(New.StdNo,New.StdFirstName,New.StdLastName,New.StdGPA); 
+		
+		-- Insert into child (UndStudent2)
+		INSERT INTO UndStudent2 (StdNo, UStdMajor, UStdMinor, UStdClass) 
+		VALUES(New.StdNo, New.UStdMajor, New.UStdMinor, New.UStdClass);
+		
+		EXCEPTION
+		WHEN OTHERS THEN
+			raise notice 'DB error in tr_UndStudent_II';
+			RETURN NULL;
+		END;
+	RETURN NEW;
+END;
+$tr_AllUndStudent_II$ LANGUAGE plpgsql; 
+
+-- Create Trigger 
+
+CREATE TRIGGER tr_AllUndStudent_II
+INSTEAD OF INSERT ON AllUndStudent
+FOR EACH ROW EXECUTE FUNCTION tr_AllUndStudent_II()
+
+-- Create Trigger function
+
+CREATE OR REPLACE FUNCTION tr_AllGradStudent_II()
+	RETURNS TRIGGER AS $tr_AllGradStudent_II$
+BEGIN
+	BEGIN
+		-- Insert into parent (Student2)
+		INSERT INTO Student2 (StdNo, StdFirstName, StdLastName,StdGPA) 
+		VALUES(New.StdNo,New.StdFirstName,New.StdLastName,New.StdGPA); 
+		
+		-- Insert into child (GradStudent2)
+		INSERT INTO GradStudent2(StdNo,GStdAdvisor,GStdThesisOpt, GStdAsstStatus) 
+		VALUES(New.StdNo,New.GStdAdvisor,New.GStdThesisOpt,New.GStdAsstStatus);
+		
+		EXCEPTION
+		WHEN OTHERS THEN
+			raise notice 'DB error in tr_GradStudent_II';
+			RETURN NULL;
+		END;
+	RETURN NEW;
+END;
+$tr_AllGradStudent_II$ LANGUAGE plpgsql; 
+
+-- Create Trigger 
+
+CREATE TRIGGER tr_AllGradStudent_II
+INSTEAD OF INSERT ON AllGradStudent
+FOR EACH ROW EXECUTE FUNCTION tr_AllGradStudent_II()
+
+
+/**************************************************************************************************************************/
+-- Example 11.37: Testing Code for INSTEAD OF INSERT Triggers
+/**************************************************************************************************************************/
+
+-- Test cases for tr_UndStudent_II
+INSERT INTO AllUndStudent
+ (StdNo,StdFirstName,StdLastName,StdGPA,UStdMajor,UStdMinor, 
+  UStdClass)
+ VALUES('123-45-6789','HOMER','WELLS',3.00,'IS','ACCT','FR');
+ 
+INSERT INTO AllUndStudent
+ (StdNo, StdFirstName, StdLastName, StdGPA, UStdMajor, UStdMinor, 
+  UStdClass)
+ VALUES('234-56-7890','CANDY','KENDALL',2.70,'FIN','IS','JR');
+-- SELECT statements to verify insertions
+SELECT * FROM AllUndStudent;
+SELECT * FROM Student2;
+SELECT * FROM UndStudent2
+
+-- Test cases for tr_GradStudent_II
+INSERT INTO AllGradStudent
+ (StdNo, StdFirstName, StdLastName, StdGPA, GStdAdvisor, 
+  GStdThesisOpt, GStdAsstStatus)
+ VALUES ('345-67-8901','WALLY','KENDALL', 2.80, 'Jones', 'NONTHESIS', 
+         'NONE');
+INSERT INTO AllGradStudent
+ (StdNo, StdFirstName, StdLastName, StdGPA, GStdAdvisor, 
+  GStdThesisOpt, GStdAsstStatus)
+ VALUES ('456-78-9012','JOE','ESTRADA', 3.20,'Jones','THESIS','RA');
+-- SELECT statements to verify insertions
+SELECT * FROM AllGradStudent;
+SELECT * FROM Student2;
+SELECT * FROM GradStudent2;
+
+/**************************************************************************************************************************/
+-- Example 11.38: Modification of Trigger in Example 11.36.
+-- Ensure that an Undergraduate Student is not in the GradStudent Table along with Testing Code.
+/**************************************************************************************************************************/
+
+-- Create Trigger function
+
+CREATE OR REPLACE FUNCTION tr_AllUndStudent_II()
+	RETURNS TRIGGER AS $tr_AllUndStudent_II$
+DECLARE 
+    GrdStdCnt INTEGER;
+BEGIN
+	SELECT COUNT(*) INTO GrdStdCnt FROM GradStudent2
+	  WHERE GradStudent2.StdNo = New.StdNo;
+	IF GrdStdCnt > 0 THEN
+		raise exception 'DB error in tr_UndStudent_II. Graduate student already exists. StdNo: %',New.StdNo;
+	END IF;
+	BEGIN
+		-- Insert into parent (Student2)
+		INSERT INTO Student2 (StdNo, StdFirstName, StdLastName,StdGPA) 
+		VALUES(New.StdNo,New.StdFirstName,New.StdLastName,New.StdGPA); 
+		
+		-- Insert into child (UndStudent2)
+		INSERT INTO UndStudent2 (StdNo, UStdMajor, UStdMinor, UStdClass) 
+		VALUES(New.StdNo, New.UStdMajor, New.UStdMinor, New.UStdClass);
+		
+		EXCEPTION
+		WHEN OTHERS THEN
+			raise notice 'DB error in tr_UndStudent_II';
+			RETURN NULL;
+		END;
+	RETURN NEW;
+END;
+$tr_AllUndStudent_II$ LANGUAGE plpgsql; 
+
+-- creat Trigger 
+----- do not need to create this trigger again if it was created in example 11.36
+----- only the trigger function must be updated.  
+
+CREATE TRIGGER tr_AllUndStudent_II
+INSTEAD OF INSERT ON AllUndStudent
+FOR EACH ROW EXECUTE FUNCTION tr_AllUndStudent_II()
+
+-- Trigger testing statements
+-- Test cases for tr_UndStudent_II: should succeed
+
+INSERT INTO AllUndStudent
+(StdNo, StdFirstName, StdLastName, StdGPA, UStdMajor, UStdMinor,
+ UStdClass) 
+VALUES ('123-45-6789','HOMER','WELLS',3.00,'IS','ACCT','FR');
+INSERT INTO AllUndStudent
+ (StdNo, StdFirstName, StdLastName, StdGPA, UStdMajor, UStdMinor, 
+  UStdClass)
+ VALUES ('234-56-7890','CANDY','KENDALL',2.70,'FIN','IS','JR');
+ 
+-- Test cases for tr_GradStudent_IA: should succeed
+INSERT INTO AllGradStudent
+ (StdNo, StdFirstName, StdLastName, StdGPA, GStdAdvisor, 
+  GStdThesisOpt, GStdAsstStatus)
+ VALUES('345-67-8901','WALLY','KENDALL', 2.80, 'Jones', 'NONTHESIS', 
+        'NONE');
+INSERT INTO AllGradStudent
+ (StdNo, StdFirstName, StdLastName, StdGPA, GStdAdvisor, 
+  GStdThesisOpt, GStdAsstStatus)
+ VALUES ('456-78-9012','JOE','ESTRADA', 3.20,'Jones','THESIS','RA');
+-- Test cases should fail because grad student exists
+INSERT INTO AllUndStudent
+(StdNo, StdFirstName, StdLastName, StdGPA, UStdMajor, UStdMinor,  
+ UStdClass)
+ VALUES ('345-67-8901','WALLY','KENDALL', 3.00,'IS','ACCT','FR');
+ 
+/**************************************************************************************************************************/
+-- Example 11.40 Updatable Join View
+/**************************************************************************************************************************/
+-- Updatable Join View Combining the Course and the Offering Tables. 
+CREATE VIEW CourseOfferingView AS
+  SELECT Course.CourseNo, CrsDesc, CrsUnits,
+         OfferNo, OffTerm, OffYear,
+         OffLocation, OffTime, FacNo, OffDays,
+         OffLimit, OffNumEnrolled
+	FROM Course INNER JOIN Offering 
+        ON Course.CourseNo = Offering.CourseNo
+
+
+
+/**************************************************************************************************************************/
+-- Example 11.41: INSTEAD OF INSERT Trigger to Map a View Insertion to the 
+/**************************************************************************************************************************/
+
+-- Create Trigger Function
+
+CREATE OR REPLACE FUNCTION tr_CourseOfferingView_II()
+	RETURNS TRIGGER AS $tr_CourseOfferingView_II$
+DECLARE 
+	CourseCnt INTEGER;
+BEGIN
+	BEGIN
+		SELECT COUNT(*) INTO CourseCnt 
+		FROM Course 
+		WHERE CourseNo = NEW.CourseNo; 
+	
+		IF CourseCnt = 0 THEN
+		-- INSERT into Course table
+			INSERT INTO Course (CourseNo, CrsDesc, CrsUnits) 
+				VALUES(NEW.CourseNo, NEW.CrsDesc, NEW.CrsUnits);
+		END IF;
+		-- INSERT into Offering table
+	
+		INSERT INTO Offering (OfferNo, CourseNo, OffTerm, OffYear, OffLocation, 
+							  OffTime, FacNo, OffDays, OffLimit, OffNumEnrolled)
+		VALUES(NEW.OfferNo, NEW.CourseNo, NEW.OffTerm, NEW.OffYear,NEW.OffLocation, 
+			   NEW.OffTime, NEW.FacNo, NEW.OffDays,NEW.OffLimit, NEW.OffNumEnrolled);
+	
+	EXCEPTION
+	WHEN OTHERS THEN
+		raise notice 'DB error in tr_CourseOfferingView_II';
+		RETURN NULL;
+	END;
+	RETURN NEW;
+END;
+$tr_CourseOfferingView_II$ LANGUAGE plpgsql; 
+
+-- Create Trigger
+
+CREATE TRIGGER tr_CourseOfferingView_II
+INSTEAD OF INSERT ON CourseOfferingView
+FOR EACH ROW EXECUTE FUNCTION tr_CourseOfferingView_II()
+
+-- Trigger testing statements
+-- Insert only an Offering as Course exists
+INSERT INTO CourseOfferingView
+ (OfferNo, CourseNo, OffTerm, OffYear, OffLocation, OffTime,
+  FacNo, OffDays, OffLimit, OffNumEnrolled)
+ VALUES (9999,'IS320','SUMMER',2017,'BLM402','9:00:00', NULL,'MW', 
+         10, 0);
+-- Ensure that a row has been added to the Offering table
+SELECT * FROM Offering WHERE OfferNo = 9999;
+-- Insert into both Offering and Course as Course does not exist
+INSERT INTO CourseOfferingView
+ (CourseNo, CrsDesc, CrsUnits, OfferNo, OffTerm, OffYear, 
+  OffLocation, OffTime, FacNo, OffDays, OffLimit, OffNumEnrolled)
+ VALUES ('IS321', 'IT Security', 3, 9009, 'SUMMER', 2017, 
+         'BLM412','9:00:00', NULL,'TTH', 10, 0);
+-- Ensure that a row has been added to both tables
+SELECT * FROM Course WHERE CourseNo = 'IS321';
+SELECT * FROM Offering WHERE OfferNo = 9009;
+
+
+ /**************************************************************************************************************************/
+-- Example 11.43: Trigger to determine if a student is already registered. 
+-- The trigger calls the function defined before the trigger.
+/**************************************************************************************************************************/
+
+-- Pre-defined function to check whether a student is already registered or not.
+-- Returns true if a Registration row exists with aStdNo,  aRegTerm, and aRegYear. 
+-- Returns false otherwise.
+
+CREATE OR REPLACE FUNCTION fn_RegExists
+		(aStdNo Student.StdNo%TYPE, aRegTerm Registration.RegTerm%TYPE, aRegYear Registration.RegYear%TYPE) 
+RETURNS BOOLEAN AS $$
+DECLARE 
+	RegCount INTEGER;
+BEGIN
+	SELECT COUNT(*) INTO RegCount
+	FROM Registration
+	WHERE StdNo = aStdNo AND RegTerm = aRegTerm AND RegYear = aRegYear;
+
+	IF RegCount = 0 THEN
+  		RETURN FALSE;
+	END IF;
+	
+	RETURN TRUE;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create trigger function
+
+CREATE OR REPLACE FUNCTION tr_Registration_IB()
+	RETURNS TRIGGER AS $tr_Registration_IB$
+DECLARE 
+    ExMessage VARCHAR(256);
+BEGIN
+	ExMessage := 'Registration exists: Error in tr_Registration_IB';
+	IF fn_RegExists(NEW.StdNo, NEW.RegTerm, NEW.RegYear) THEN
+		raise exception '%', ExMessage;
+	END IF;   
+	RETURN NEW;
+END;
+$tr_Registration_IB$ LANGUAGE plpgsql; 
+
+
+-- Create trigger
+
+CREATE TRIGGER tr_Registration_IB
+BEFORE INSERT
+ON Registration
+FOR EACH ROW EXECUTE FUNCTION tr_Registration_IB();
+
+-- Testing statements
+-- Insert a new student
+INSERT INTO Student
+	(StdNo, StdFirstName, StdLastName, StdCity,
+	 StdState, StdMajor, StdClass, StdGPA, StdZip)
+	VALUES ('999-99-9999', 'JOE', 'JONES', 'DENVER','CO', 'IS', 
+            'SO',3.00,'80217-3364');
+-- Insert a registration for the new student without a failure.
+INSERT INTO Registration
+	(RegNo,StdNo,RegStatus,RegDate,RegTerm,RegYear)
+	VALUES (1301,'999-99-9999','F','27-Feb-2017','Spring',2017);
+-- Insert another registration in a different term without a failure.
+INSERT INTO Registration
+	(RegNo,StdNo,RegStatus,RegDate,RegTerm,RegYear)
+	VALUES (1302,'999-99-9999','F','27-Apr-2017','Fall',2017);
+-- Insert a third registration in the same term with a failure.
+INSERT INTO Registration
+	(RegNo,StdNo,RegStatus,RegDate,RegTerm,RegYear)
+	VALUES (1303,'999-99-9999','F','27-Apr-2017','Fall',2017);
+
+select * from Registration
+where RegNo = 1303 and StdNo = '999-99-9999' and RegTerm = '27-Apr-2017' and RegYear = 2017;
+
+
+

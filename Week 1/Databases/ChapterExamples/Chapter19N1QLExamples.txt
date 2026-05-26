@@ -1,0 +1,251 @@
+// Couchbase N1QL examples from Chapter 19
+// All examples were executed in Couchbase 7.02 Community Edition
+
+// Create bucket: Chapter19Example or use your own name
+// Allocate quota: 100MiB
+// Create scope: Chapter19Examples or use _default scope
+
+// Create collections
+// Set bucket and scope in Workbench before executing CREATE COLLECTION statements.
+// I had to execute statements one at a time.
+// When executed together, a syntax error occurred.
+CREATE COLLECTION Agent;
+CREATE COLLECTION Home;
+CREATE COLLECTION AgentHome;
+CREATE COLLECTION Agent2;
+CREATE COLLECTION Home2;
+
+// Create indexes
+// I had to execute statements one at a time.
+// When executed them together, a syntax error occurred.
+CREATE PRIMARY INDEX ON Agent;
+CREATE PRIMARY INDEX ON Home;
+CREATE PRIMARY INDEX ON AgentHome;
+CREATE PRIMARY INDEX ON Agent2;
+CREATE PRIMARY INDEX ON Home2;
+
+// Traditional table design with foreign keys
+// INSERT statement adding 3 documents in the Agent bucket
+// INSERT statement can add multiple JSON documents by
+// repeating VALUES clause
+
+INSERT INTO Agent (KEY, VALUE)
+VALUES ("A871111",
+  {"AgentId":"A871111", "AgFirstName":"Willie", 
+   "AgLastName":"Jones", "AgPhone":"(720)555-1212"} ),
+
+VALUES ("A991111",
+  {"AgentId":"A991111", "AgFirstName":"Jorge", 
+   "AgLastName":"Lopez", "AgPhone":"(303)435-9999"} ),
+
+VALUES ("A999222",
+  {"AgentId":"A999222", "AgFirstName":"Aimee", 
+   "AgLastName":"Chan", "AgPhone": "(303)555-8888"} );
+
+// One INSERT statement for all home documents
+INSERT INTO Home (KEY, VALUE)
+VALUES ("H111111",
+ {"HomeId":"H111111","HomeNoBdrms":3,
+  "HomeNoBathrms":2,"HomeAge":15,"AgentId":"A871111",
+  "HomeAddr":{"City":"Denver","State":"CO","ZipCode":80113} } ),
+
+VALUES ("H222222",
+ {"HomeId":"H2222222","HomeNoBdrms":4,
+  "HomeNoBathrms":3,"HomeAge":25,"AgentId":"A871111",
+  "HomeAddr":{"City":"Centennial","State":"CO","ZipCode":80112} } ),
+
+VALUES ("H333333",
+ {"HomeId":"H333333","HomeNoBdrms":2,
+  "HomeNoBathrms":2,"HomeAge":3,"AgentId":"A991111",
+  "HomeAddr":{"City":"Denver","State":"CO","ZipCode":80104} } ),
+
+VALUES ("H444444",
+ {"HomeId":"H444444","HomeNoBdrms":5,
+  "HomeNoBathrms":3,"HomeAge":10,"AgentId":"A999222",
+  "HomeAddr":{"City":"Aurora","State":"CO","ZipCode":80107} } ),
+
+VALUES ("H555555",
+ {"HomeId":"H555555","HomeNoBdrms":3,
+  "HomeNoBathrms":2,"HomeAge":null,"AgentId":"A999222",
+  "HomeAddr":{"City":"Centennial","State":"CO","ZipCode":80112} } ),
+
+VALUES ("HomeH666666",
+ {"HomeId":"H666666","HomeNoBdrms":4,
+  "HomeNoBathrms":2,"HomeSold":false,"AgentId":"A999222",
+  "HomeAddr":{"City":"Aurora","State":"CO","ZipCode":80109} } );
+
+// Total nested representation with homes nested inside agents
+// INSERT statement for the AgentHome bucket
+INSERT INTO AgentHome (KEY, VALUE)
+ VALUES ("AH871111",
+  {"AgentId":"A871111", "AgFirstName":"Willie", 
+   "AgLastName":"Jones", "AgPhone":"(720)555-1212",
+    "Home":[
+     {"HomeId":"H111111","HomeNoBdrms":3,
+      "HomeNoBathrms":2,"HomeAge":15,
+      "HomeAddr":{"City":"Denver","State":"CO","ZipCode":80110}},
+     {"HomeId":"H222222","HomeNoBdrms":4,
+      "HomeNoBathrms":3,"HomeAge":25,
+      "HomeAddr":{"City":"Centennial","State":"CO","ZipCode":80112}}] } ),
+
+VALUES ("AH991111",
+  {"AgentId":"A991111", "AgFirstName":"Jorge", 
+   "AgLastName":"Lopez", "AgPhone":"(303)435-9999",
+    "Home":[
+     {"HomeId":"H333333","HomeNoBdrms":2,
+      "HomeNoBathrms":2,"HomeAge":3,
+      "HomeAddr":{"City":"Denver","State":"CO","ZipCode":80104}}] } ),
+
+VALUES ("AH999222",
+  {"AgentId":"A999222", "AgFirstName":"Aimee", 
+   "AgLastName":"Chan", "AgPhone":"(303)555-8888",
+    "Home":[
+     {"HomeId":"H444444","HomeNoBdrms":5,
+      "HomeNoBathrms":3,"HomeAge":10,
+      "HomeAddr":{"City":"Aurora","State":"CO","ZipCode":80107}},
+     {"HomeId":"H555555","HomeNoBdrms":3,
+      "HomeNoBathrms":2,"HomeAge":null,
+      "HomeAddr":{"City":"Centennial","State":"CO","ZipCode":80112}},
+     {"HomeId":"H666666","HomeNoBdrms":4,
+      "HomeNoBathrms":2,"HomeSold":false,
+      "HomeAddr":{"City":"Aurora","State":"CO","ZipCode":80109} } ] } );
+
+// Partial nested representation with home ids nested inside agents
+// INSERT statement for the Agent2 bucket with array of home ids
+INSERT INTO Agent2 (KEY, VALUE)
+VALUES ("A871111",
+  {"AgentId":"A871111", "AgFirstName":"Willie", 
+   "AgLastName":"Jones", "AgPhone":"(720)555-1212", 
+   "HomeId":["H111111","H222222"] } ),
+
+VALUES ("A991111",
+  {"AgentId":"A991111", "AgFirstName":"Jorge", 
+   "AgLastName":"Lopez", "AgPhone":"(303)435-9999",
+   "HomeId":["H333333"] } ),
+
+VALUES ("A999222",
+  {"AgentId":"A999222", "AgFirstName":"Aimee", 
+   "AgLastName":"Chan", "AgPhone": "(303)555-8888",
+   "HomeId":["H444444","H555555","H666666"] } );
+
+// INSERT statement for the Home2 bucket
+INSERT INTO Home2 (KEY, VALUE)
+VALUES ("H111111",
+ {"HomeId":"H111111","HomeNoBdrms":3,
+  "HomeNoBathrms":2,"HomeAge":15,
+  "HomeAddr":{"City":"Denver","State":"CO","ZipCode":80113} } ),
+
+VALUES ("H222222",
+ {"HomeId":"H2222222","HomeNoBdrms":4,
+  "HomeNoBathrms":3,"HomeAge":25,
+  "HomeAddr":{"City":"Centennial","State":"CO","ZipCode":80112} } ),
+
+VALUES ("H333333",
+ {"HomeId":"H333333","HomeNoBdrms":2,
+  "HomeNoBathrms":2,"HomeAge":3,
+  "HomeAddr":{"City":"Denver","State":"CO","ZipCode":80104} } ),
+
+VALUES ("H444444",
+ {"HomeId":"H444444","HomeNoBdrms":5,
+  "HomeNoBathrms":3,"HomeAge":10,
+  "HomeAddr":{"City":"Aurora","State":"CO","ZipCode":80107} } ),
+
+VALUES ("H555555",
+ {"HomeId":"H555555","HomeNoBdrms":3,
+  "HomeNoBathrms":2,"HomeAge":null,
+  "HomeAddr":{"City":"Centennial","State":"CO","ZipCode":80112} } ),
+
+VALUES ("H666666",
+ {"HomeId":"H666666","HomeNoBdrms":4,
+  "HomeNoBathrms":2,"HomeSold":false,
+  "HomeAddr":{"City":"Aurora","State":"CO","ZipCode":80109} } );
+
+// Chapter 19 examples in Section 19.5.2
+// Examples 19.38 to 19.40, 19.55, and 19.56 are INSERT statements covered by the INSERT statements in Appendix 19.A.
+
+// Example 19.41
+SELECT AgLastName, AgPhone
+ FROM AgentHome
+ WHERE AgFirstName = "Willie";
+
+// Example 19.42
+SELECT *
+ FROM AgentHome
+ WHERE AgFirstName = "Willie";
+
+// Example 19.43
+SELECT AgFirstName, AgLastName, Home
+ FROM AgentHome
+ WHERE ANY h IN Home SATISFIES h.HomeNoBdrms > 4 END;
+
+// Example 19.44
+SELECT AgFirstName, AgLastName, Home[*].HomeAddr, Home[*].HomeAge
+ FROM AgentHome
+ WHERE ANY h IN Home SATISFIES h.HomeAge < 10 END;
+
+// Example 19.45
+SELECT AgFirstName, AgLastName, Home[*].HomeAddr, Home[*].HomeAge
+ FROM AgentHome
+ WHERE EVERY member IN Home SATISFIES member.HomeAge > 10 END;
+
+// Example 19.46
+SELECT AgFirstName, AgLastName, ARRAY_COUNT(Home) AS HomeCount
+ FROM AgentHome;
+
+// Example 19.47
+SELECT AgFirstName, AgLastName, 
+       ARRAY_AVG(Home[*].HomeAge) AS HomeAgeAvg
+ FROM AgentHome;
+
+// Example 19.48
+SELECT AgentHome.AgLastName, h.HomeAddr
+ FROM AgentHome
+ UNNEST Home h
+ WHERE AgentHome.AgLastName = "Jones";
+
+// Example 19.49
+SELECT h.HomeAddr.ZipCode, COUNT(*) AS HomeCount
+ FROM AgentHome
+ UNNEST Home h
+ WHERE h.HomeAddr.City = "Denver"
+ GROUP BY h.HomeAddr.ZipCode;
+
+// Example 19.50
+SELECT h.HomeAddr.City, AVG(h.HomeNoBdrms) AS AvgHomeBeds
+ FROM AgentHome
+ UNNEST Home h
+ WHERE h.HomeNoBathrms > 1
+ GROUP BY h.HomeAddr.City
+ HAVING AVG(h.HomeNoBdrms) > 3;
+
+// Example 19.51
+SELECT *
+ FROM Home JOIN Agent ON KEYS Home.AgentId
+ WHERE Agent.AgFirstName = "Willie";
+
+// Example 19.52
+SELECT A.AgFirstName, A.AgLastName, H.HomeAddr, H.HomeAge
+ FROM Home H JOIN Agent A ON KEYS H.AgentId
+ WHERE H.HomeAge < 10;
+ 
+// Example 19.53
+SELECT A.AgFirstName, A.AgLastName, COUNT(*) as HomeCount
+ FROM Home H JOIN Agent A ON KEYS H.AgentId
+ GROUP BY A.AgFirstName, A.AgLastName;
+
+// Example 19.54
+SELECT H.HomeAddr.City, AVG(H.HomeNoBdrms) AS AvgHomeBeds
+ FROM Home H JOIN Agent A ON KEYS H.AgentId
+ WHERE H.HomeNoBathrms > 1
+ GROUP BY H.HomeAddr.City
+ HAVING AVG(H.HomeNoBdrms) > 3;
+
+// Example 19.57
+SELECT *
+ FROM Agent2 JOIN Home2 ON KEYS Agent2.HomeId
+ WHERE Agent2.AgFirstName = "Willie";
+
+// Example 19.58
+SELECT *
+ FROM  Agent2 NEST Home2 ON KEYS Agent2.HomeId
+  WHERE Agent2.AgFirstName = "Willie";
