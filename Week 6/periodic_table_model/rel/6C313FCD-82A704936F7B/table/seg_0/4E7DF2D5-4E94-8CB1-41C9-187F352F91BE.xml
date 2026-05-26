@@ -1,0 +1,35 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="4E7DF2D5-4E94-8CB1-41C9-187F352F91BE" name="Period">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-16 00:02:14 UTC</createdTime>
+<generatorID>898B56B9-7C69-9C00-7224-61EB59BCA766</generatorID>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="period_id" id="A920DE77-0154-632E-5179-8825EFA37849">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-16 00:02:14 UTC</createdTime>
+<generatorID>51A31BAE-5EAB-F9A1-6943-5BC4FF52CFFE</generatorID>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="19646A1D-3D8B-D8AE-C4D2-E79149E030E9" name="Period_period_id_UN">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-16 00:02:14 UTC</createdTime>
+<generatorID>2F137BBD-77AA-2026-6CF9-C9F7CA884E08</generatorID>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<indexState>Unique Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="A920DE77-0154-632E-5179-8825EFA37849"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

@@ -1,0 +1,44 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="898B56B9-7C69-9C00-7224-61EB59BCA766" name="Period">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-15 23:44:52 UTC</createdTime>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<engineerTo>
+<item key="6C313FCD-40AF-70C8-D44D-82A704936F7B" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="period_id" id="51A31BAE-5EAB-F9A1-6943-5BC4FF52CFFE">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-15 23:46:20 UTC</createdTime>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<engineerTo>
+<item key="6C313FCD-40AF-70C8-D44D-82A704936F7B" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="2F137BBD-77AA-2026-6CF9-C9F7CA884E08" name="Key_1">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-15 23:46:51 UTC</createdTime>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<engineerTo>
+<item key="6C313FCD-40AF-70C8-D44D-82A704936F7B" value="true"/>
+</engineerTo>
+<newElementsIDs>51A31BAE-5EAB-F9A1-6943-5BC4FF52CFFE</newElementsIDs>
+<usedAttributes>
+<attributeRef>51A31BAE-5EAB-F9A1-6943-5BC4FF52CFFE</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

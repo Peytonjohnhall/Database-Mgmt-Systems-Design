@@ -1,0 +1,7 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<LogicalDesign class="oracle.dbtools.crest.model.design.logical.LogicalDesign" name="Logical" id="76D2688E-25E6-69C6-7744-0D8C3CCA49CF" mainViewID="4E46FB28-032C-F07A-DD0B-D524C64E1FC3">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-13 19:26:21 UTC</createdTime>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<shouldBeOpen>false</shouldBeOpen>
+</LogicalDesign>

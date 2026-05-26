@@ -1,0 +1,44 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="55AE31CF-19D6-44F3-C91B-46E83E4A3A6E" name="Category">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-15 20:29:01 UTC</createdTime>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<engineerTo>
+<item key="6C313FCD-40AF-70C8-D44D-82A704936F7B" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="category_id" id="19B9F8F9-FBE8-775C-A850-87CBC5FC22D0">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-15 20:30:07 UTC</createdTime>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<engineerTo>
+<item key="6C313FCD-40AF-70C8-D44D-82A704936F7B" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="F8ADB1A3-D365-057F-FBC1-83DD5388AD33" name="Key_1">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-15 20:31:01 UTC</createdTime>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<engineerTo>
+<item key="6C313FCD-40AF-70C8-D44D-82A704936F7B" value="true"/>
+</engineerTo>
+<newElementsIDs>19B9F8F9-FBE8-775C-A850-87CBC5FC22D0</newElementsIDs>
+<usedAttributes>
+<attributeRef>19B9F8F9-FBE8-775C-A850-87CBC5FC22D0</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

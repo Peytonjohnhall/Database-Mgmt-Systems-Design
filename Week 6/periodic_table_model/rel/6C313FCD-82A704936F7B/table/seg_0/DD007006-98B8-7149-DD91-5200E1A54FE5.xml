@@ -1,0 +1,35 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="DD007006-98B8-7149-DD91-5200E1A54FE5" name="Category">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-16 00:02:14 UTC</createdTime>
+<generatorID>55AE31CF-19D6-44F3-C91B-46E83E4A3A6E</generatorID>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="category_id" id="34B9CFA0-723B-2EB1-0E89-32235757389D">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-16 00:02:14 UTC</createdTime>
+<generatorID>19B9F8F9-FBE8-775C-A850-87CBC5FC22D0</generatorID>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="137994BC-CE9B-69E5-B527-B1D4EADF137C" name="Category_category_id_UN">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-16 00:02:14 UTC</createdTime>
+<generatorID>F8ADB1A3-D365-057F-FBC1-83DD5388AD33</generatorID>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<indexState>Unique Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="34B9CFA0-723B-2EB1-0E89-32235757389D"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

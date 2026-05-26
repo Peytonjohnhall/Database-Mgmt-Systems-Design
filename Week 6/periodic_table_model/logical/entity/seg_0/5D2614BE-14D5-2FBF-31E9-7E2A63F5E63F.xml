@@ -1,0 +1,133 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="5D2614BE-14D5-2FBF-31E9-7E2A63F5E63F" name="Element">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-13 19:42:45 UTC</createdTime>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<engineerTo>
+<item key="6C313FCD-40AF-70C8-D44D-82A704936F7B" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="atomic_number" id="35DCBEBC-B0E4-E5D3-EE40-2B1D5016818E">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-13 19:44:00 UTC</createdTime>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<engineerTo>
+<item key="6C313FCD-40AF-70C8-D44D-82A704936F7B" value="true"/>
+</engineerTo>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="element_name" id="CD5FEE61-4E5C-8331-832A-9D1569C352AD">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-13 19:44:25 UTC</createdTime>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<engineerTo>
+<item key="6C313FCD-40AF-70C8-D44D-82A704936F7B" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="symbol" id="31C95541-8555-6246-F1EE-2C93BBD2B015">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-13 19:44:37 UTC</createdTime>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<engineerTo>
+<item key="6C313FCD-40AF-70C8-D44D-82A704936F7B" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="atomic_mass" id="EB4F800D-692C-1537-72F9-4F072E55DE27">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-13 19:44:45 UTC</createdTime>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<engineerTo>
+<item key="6C313FCD-40AF-70C8-D44D-82A704936F7B" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="period" id="939784E7-A213-CF2D-4F95-6A430346070C">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-13 19:44:54 UTC</createdTime>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<engineerTo>
+<item key="6C313FCD-40AF-70C8-D44D-82A704936F7B" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="group_number" id="9C2C2586-1A04-0FF8-28C2-26513D207596">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-13 19:45:05 UTC</createdTime>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<engineerTo>
+<item key="6C313FCD-40AF-70C8-D44D-82A704936F7B" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="category" id="678AF00E-7D2F-2CA5-B9C1-841E12518067">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-13 19:45:46 UTC</createdTime>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<engineerTo>
+<item key="6C313FCD-40AF-70C8-D44D-82A704936F7B" value="true"/>
+</engineerTo>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="category_id" id="B0A5B493-B157-1225-2493-9C0055BB68B5">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-15 23:39:34 UTC</createdTime>
+<generatorID>36DDFA31-F54B-277B-E389-E1491CEBD9D7</generatorID>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<engineerTo>
+<item key="6C313FCD-40AF-70C8-D44D-82A704936F7B" value="true"/>
+</engineerTo>
+<referedAttribute>19B9F8F9-FBE8-775C-A850-87CBC5FC22D0</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="period_id" id="D85F673B-4A0F-998C-608D-17882FD15BAC">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-15 23:48:45 UTC</createdTime>
+<generatorID>FD616795-3D27-20C6-4A5B-8BF2C7ADDB17</generatorID>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<engineerTo>
+<item key="6C313FCD-40AF-70C8-D44D-82A704936F7B" value="true"/>
+</engineerTo>
+<referedAttribute>51A31BAE-5EAB-F9A1-6943-5BC4FF52CFFE</referedAttribute>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="94940BD6-6631-D263-314A-F8DF4A513237" name="Element PK">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-13 19:44:18 UTC</createdTime>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<engineerTo>
+<item key="6C313FCD-40AF-70C8-D44D-82A704936F7B" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>35DCBEBC-B0E4-E5D3-EE40-2B1D5016818E</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

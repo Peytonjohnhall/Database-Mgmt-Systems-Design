@@ -1,0 +1,143 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="D372E3BB-3917-7EAC-1524-C738EF8CCD01" name="Element">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-16 00:02:14 UTC</createdTime>
+<generatorID>5D2614BE-14D5-2FBF-31E9-7E2A63F5E63F</generatorID>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="atomic_number" id="B788351E-111F-8980-267E-41B85C1C701D">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-16 00:02:14 UTC</createdTime>
+<generatorID>35DCBEBC-B0E4-E5D3-EE40-2B1D5016818E</generatorID>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="element_name" id="304EC45D-7B88-A324-C972-32070DF22856">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-16 00:02:14 UTC</createdTime>
+<generatorID>CD5FEE61-4E5C-8331-832A-9D1569C352AD</generatorID>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="symbol" id="57B840FE-08D1-9C65-7855-FD23F26455D7">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-16 00:02:14 UTC</createdTime>
+<generatorID>31C95541-8555-6246-F1EE-2C93BBD2B015</generatorID>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="atomic_mass" id="FC32C867-8F83-4DE9-3EB8-8F2C8D216B39">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-16 00:02:14 UTC</createdTime>
+<generatorID>EB4F800D-692C-1537-72F9-4F072E55DE27</generatorID>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="period" id="4D8C8F06-498C-4912-D9B6-A4B34E48C2C8">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-16 00:02:14 UTC</createdTime>
+<generatorID>939784E7-A213-CF2D-4F95-6A430346070C</generatorID>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="group_number" id="4215BE3B-827D-690A-3DD9-58CB4CB1E15D">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-16 00:02:14 UTC</createdTime>
+<generatorID>9C2C2586-1A04-0FF8-28C2-26513D207596</generatorID>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="category" id="7238B2D9-1F27-CBFA-3538-6B9766FCB82B">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-16 00:02:14 UTC</createdTime>
+<generatorID>678AF00E-7D2F-2CA5-B9C1-841E12518067</generatorID>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="Category_category_id" id="DA03BA9D-F39E-8A5E-89AF-D6E7B1CFC4D1">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-16 00:02:14 UTC</createdTime>
+<generatorID>B0A5B493-B157-1225-2493-9C0055BB68B5</generatorID>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="5997BFAD-61BF-CC50-A30F-BC49DE67CADB" referredColumn="34B9CFA0-723B-2EB1-0E89-32235757389D"/>
+</associations>
+</Column>
+<Column name="Period_period_id" id="8E0C488A-1C4B-19DA-83F2-0CEF7ABD744B">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-16 00:02:14 UTC</createdTime>
+<generatorID>D85F673B-4A0F-998C-608D-17882FD15BAC</generatorID>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<use>0</use>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="63512926-4AF7-B7A2-65E1-964A72D0C39D" referredColumn="A920DE77-0154-632E-5179-8825EFA37849"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="E7BE8F24-4E1B-EB11-05C1-30A203F3F765" name="Element_PK">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-16 00:02:14 UTC</createdTime>
+<generatorID>94940BD6-6631-D263-314A-F8DF4A513237</generatorID>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="B788351E-111F-8980-267E-41B85C1C701D"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="013B7E65-21A0-4E42-75E0-DCBDD7991059" name="Element_Category_FK">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-16 00:02:14 UTC</createdTime>
+<generatorID>36DDFA31-F54B-277B-E389-E1491CEBD9D7</generatorID>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="DA03BA9D-F39E-8A5E-89AF-D6E7B1CFC4D1"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="80B22430-922D-5B46-634F-9D80EE11CD27" name="Element_Period_FK">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-16 00:02:14 UTC</createdTime>
+<generatorID>FD616795-3D27-20C6-4A5B-8BF2C7ADDB17</generatorID>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="8E0C488A-1C4B-19DA-83F2-0CEF7ABD744B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

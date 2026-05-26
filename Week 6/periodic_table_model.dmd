@@ -1,0 +1,8 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="periodic_table_model" id="BB653783-A776-FCDB-3D2C-84104F2257AA" version="3.5">
+<createdBy>peytonhall</createdBy>
+<createdTime>2026-03-13 19:26:21 UTC</createdTime>
+<ownerDesignName>periodic_table_model</ownerDesignName>
+<capitalNames>false</capitalNames>
+<designId>BB653783-A776-FCDB-3D2C-84104F2257AA</designId>
+</OSDM_Design>
